@@ -13,7 +13,6 @@ export class UserController {
     @Get('profile')
     @UseGuards(JwtAuthGuard)
     getProfile(@CurrentUser() user: User) {
-        // Remove password from response
         const { password, ...userProfile } = user.toJSON();
         return userProfile;
     }
