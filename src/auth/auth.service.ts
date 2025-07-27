@@ -1,7 +1,8 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -9,7 +10,8 @@ export class AuthService {
     constructor(
     @Inject('USER_REPOSITORY')
     private userRepository: typeof User,
-    private userService: UserService
+    private userService: UserService,
+    private jwtService: JwtService
   ) {}
 
     async register(registerDto: RegisterDto) {
@@ -30,9 +32,29 @@ export class AuthService {
         return result;
     }
 
-    login() {
-        // Login logic goes here
-        console.log('User logged in successfully');
+    async login(email: string, password: string) {
+        const user = await this.userService.findByEmail(email);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new UnauthorizedException('Invalid password');
+        }
+
+        const payload = { 
+            sub: user.id, 
+            email: user.email, 
+            username: user.username 
+        };
+        const token = this.jwtService.sign(payload);
+
+        const { password: _, ...userResult } = user.toJSON();
+        return {
+            user: userResult,
+            access_token: token
+        };
     }
 
     logout() {
