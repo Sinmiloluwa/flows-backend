@@ -58,7 +58,13 @@ export class AuthService {
     }
 
     logout() {
-        // Logout logic goes here
-        console.log('User logged out successfully');
+        // Since JWT tokens are stateless, logout is typically handled client-side
+        // by removing the token from storage (localStorage, cookies, etc.)
+        // For server-side logout, you could implement token blacklisting here
+        
+        return {
+            message: 'Logout successful',
+            timestamp: new Date().toISOString()
+        };
     }
 }
