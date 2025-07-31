@@ -10,6 +10,7 @@ import { LikedSong } from '../liked-songs/entities/liked-song.entity';
 import { Subscription } from '../subscription/entities/subscription.entity';
 import { SongArtist } from '../song-artists/entities/song-artist.entity';
 import { SEQUELIZE } from '../../constants';
+import { Category } from '../categories/entities/category.entity';
 
 export const databaseProviders = [
   {
@@ -36,11 +37,16 @@ export const databaseProviders = [
         ListeningHistory,
         LikedSong,
         Subscription,
-        SongArtist
+        SongArtist,
+        Category
       ]);
       
-      // Normal sync - only creates tables if they don't exist, preserves existing data
-      await sequelize.sync({ alter: true });
+      // Use alter sync only if SYNC_ALTER env var is set to 'true', otherwise use fast sync
+      if (process.env.SYNC_ALTER === 'true') {
+        await sequelize.sync({ alter: true });
+      } else {
+        await sequelize.sync();
+      }
       return sequelize;
     },
   },
