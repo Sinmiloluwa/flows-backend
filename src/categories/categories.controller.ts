@@ -4,7 +4,8 @@ import { CategoriesService } from './categories.service';
 @Controller('categories')
 export class CategoriesController {
     constructor(
-        @Inject() private readonly categoriesService: CategoriesService
+        @Inject() private readonly categoriesService: CategoriesService,
+
     ) {}
 
     @Get()

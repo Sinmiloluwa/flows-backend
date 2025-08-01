@@ -11,7 +11,9 @@ import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
-    CacheModule.register(),
+    CacheModule.register({
+      isGlobal: true, 
+    }),
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
