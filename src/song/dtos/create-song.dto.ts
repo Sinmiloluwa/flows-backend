@@ -1,14 +1,13 @@
 import { IsNotEmpty, IsString, IsOptional, IsUrl, IsNumber, IsUUID, IsArray, Min } from 'class-validator';
+import { IsValidCategory } from '../validators/is-valid-category.decorator';
 
 export class CreateSongDto {
   @IsNotEmpty()
   @IsString()
   title: string;
 
-  @IsNotEmpty()
-  @IsUUID()
-  artistId: string;
-
+  // Removed artistId - now comes from authenticated artist via ArtistGuard
+  
   @IsOptional()
   @IsUUID()
   albumId?: string;
@@ -26,9 +25,12 @@ export class CreateSongDto {
   @Min(1)
   duration: number; // in seconds
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  genre?: string;
+  @IsValidCategory({
+    message: 'Genre must be a valid active category. Check /categories endpoint for available options.'
+  })
+  genre: string;
 
   @IsOptional()
   @IsNumber()

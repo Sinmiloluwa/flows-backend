@@ -25,7 +25,7 @@ export class Song extends Model {
   @ForeignKey(() => Album)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true,
   })
   declare album_id: number;
 
@@ -56,12 +56,12 @@ export class Song extends Model {
       allowNull: true,
   })
   declare genre: string;
-
+  
   @Column({
-      type: DataType.DATE,
-      allowNull: true,
+    type: DataType.TEXT,
+    allowNull: true,
   })
-  declare created_at: Date;
+  declare cover_image_url: string;
 
   // Many-to-many relationship: Song has many Artists through SongArtist
   @BelongsToMany(() => Artist, () => SongArtist)
