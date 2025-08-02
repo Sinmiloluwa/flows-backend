@@ -71,9 +71,17 @@ export class Song extends Model {
   @BelongsToMany(() => Playlist, () => PlaylistSong)
   declare playlists: Playlist[];
 
+  // Direct relationship: Song has many PlaylistSong entries
+  @HasMany(() => PlaylistSong)
+  declare playlistSongs: PlaylistSong[];
+
   // Relationship: One song has many listening history entries
   @HasMany(() => ListeningHistory)
   declare listeningHistory: ListeningHistory[];
+
+  // Direct relationship: Song has many LikedSong entries
+  @HasMany(() => LikedSong)
+  declare likedSongs: LikedSong[];
 
   // Many-to-many relationship: Song is liked by many Users through LikedSong
   @BelongsToMany(() => User, () => LikedSong)

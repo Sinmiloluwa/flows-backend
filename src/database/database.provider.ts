@@ -45,7 +45,11 @@ export const databaseProviders = [
       if (process.env.SYNC_ALTER === 'true') {
         await sequelize.sync({ alter: true });
       } else {
-        await sequelize.sync();
+        // For faster startup, only sync if SYNC_DB is explicitly set to 'true'
+        if (process.env.SYNC_DB === 'true') {
+          await sequelize.sync();
+        }
+        // Otherwise, skip sync for faster startup (assumes DB schema already exists)
       }
       return sequelize;
     },

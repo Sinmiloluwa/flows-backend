@@ -10,6 +10,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { CategoriesModule } from './categories/categories.module';
 import { SongsModule } from './song/songs.module';
 import { PlaylistModule } from './playlist/playlist.module';
+import { PopularityModule } from './popularity/popularity.module';
+import { ListeningModule } from './listening/listening.module';
 
 @Module({
   imports: [
@@ -23,7 +25,9 @@ import { PlaylistModule } from './playlist/playlist.module';
     ArtistsModule,
     CategoriesModule,
     SongsModule,
-    PlaylistModule
+    PlaylistModule,
+    PopularityModule,
+    ListeningModule
   ],
   controllers: [AppController],
   providers: [AppService],
