@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards, ValidationPipe } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongDto } from './dtos';
 import { UserGuard } from '../guards/user.guard';
@@ -27,6 +27,17 @@ export class SongsController {
     findAllSongs(@CurrentUser() user: any): Promise<any[]> {
         console.log(`Songs fetched by user: ${user ? user.sub : 'anonymous'}`);
         return this.songsService.findAll();
+    }
+
+    @UseGuards(UserGuard)
+    @Get(':id')
+    findSongById(
+        @CurrentUser() user: any,
+        @CurrentArtist() artist: any,
+        @Param('id') id: string
+    ): Promise<any> {
+        console.log(`Song fetched by user: ${user ? user.sub : 'anonymous'}, artist: ${artist ? artist.id : 'none'}`);
+        return this.songsService.findById(id);
     }
 
 }
