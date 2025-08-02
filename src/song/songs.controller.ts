@@ -34,7 +34,7 @@ export class SongsController {
     findSongById(
         @CurrentUser() user: any,
         @CurrentArtist() artist: any,
-        @Param('id') id: string
+        @Param('id') id: number
     ): Promise<any> {
         console.log(`Song fetched by user: ${user ? user.sub : 'anonymous'}, artist: ${artist ? artist.id : 'none'}`);
         return this.songsService.findById(id);
