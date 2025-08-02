@@ -30,4 +30,8 @@ export class SongsService {
     async findAll(): Promise<Song[]> {
         return this.songModel.findAll();
     }
+
+    async findById(id: number): Promise<Song | null> {
+        return this.songModel.findByPk(id);
+    }   
 }
