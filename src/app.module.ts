@@ -9,6 +9,7 @@ import { ArtistsModule } from './artist/artists.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { CategoriesModule } from './categories/categories.module';
 import { SongsModule } from './song/songs.module';
+import { PlaylistModule } from './playlist/playlist.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { SongsModule } from './song/songs.module';
     UserModule,
     ArtistsModule,
     CategoriesModule,
-    SongsModule
+    SongsModule,
+    PlaylistModule
   ],
   controllers: [AppController],
   providers: [AppService],
