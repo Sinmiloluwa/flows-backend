@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Song } from './entities/song.entity';
 import { CreateSongDto } from './dtos';
+import { Artist } from '../artist/entities/artist.entity';
 
 @Injectable()
 export class SongsService {
@@ -32,6 +33,17 @@ export class SongsService {
     }
 
     async findById(id: number): Promise<Song | null> {
-        return this.songModel.findByPk(id);
+        return this.songModel
+        .findOne({
+            where: { id },
+            include: [
+                { 
+                    model: Artist, 
+                    as: 'artists', 
+                    through: { attributes: [] }, 
+                    required: false 
+                }
+            ]
+        });
     }   
 }
