@@ -17,6 +17,7 @@ export class PlaylistService {
                 name: createPlaylistDto.name,
                 description: createPlaylistDto.description,
                 is_public: createPlaylistDto.isPublic || false,
+                image_url: createPlaylistDto.coverImage || null,
                 user_id: userId
             });
 
@@ -38,7 +39,7 @@ export class PlaylistService {
                 : { is_public: true }; // Only show public playlists if no user
 
             const playlists = await this.playlistModel.findAll({
-                where: whereCondition,
+                // where: whereCondition,
                 include: [
                     {
                         model: Song,
@@ -213,6 +214,7 @@ export class PlaylistService {
             id: playlist.id.toString(),
             name: playlist.name,
             description: playlist.description,
+            coverImage: playlist.image_url,
             isPublic: playlist.is_public,
             totalSongs: playlist.songs ? playlist.songs.length : 0,
             totalDuration: playlist.songs ? playlist.songs.reduce((total, song) => total + song.duration, 0) : 0,
