@@ -37,6 +37,12 @@ export class Playlist extends Model {
     type: DataType.TEXT,
     allowNull: true,
   })
+  declare image_url: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
   declare description: string;
 
   @Column({
