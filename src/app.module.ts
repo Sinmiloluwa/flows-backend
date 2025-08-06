@@ -12,6 +12,7 @@ import { SongsModule } from './song/songs.module';
 import { PlaylistModule } from './playlist/playlist.module';
 import { PopularityModule } from './popularity/popularity.module';
 import { ListeningModule } from './listening/listening.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { ListeningModule } from './listening/listening.module';
     SongsModule,
     PlaylistModule,
     PopularityModule,
-    ListeningModule
+    ListeningModule,
+    SearchModule
   ],
   controllers: [AppController],
   providers: [AppService],
