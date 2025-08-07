@@ -147,11 +147,12 @@ export class PlaylistService {
         try {
             const playlist = await this.playlistModel.findByPk(playlistId);
 
+
             if (!playlist) {
                 throw new NotFoundException('Playlist not found');
             }
 
-            if (playlist.user_id.toString() !== userId) {
+            if (playlist.user_id.toString() !== userId.toString()) {
                 throw new ForbiddenException('You can only modify your own playlists');
             }
 
