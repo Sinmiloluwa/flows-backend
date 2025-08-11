@@ -219,7 +219,7 @@ export class PlaylistService {
             isPublic: playlist.is_public,
             totalSongs: playlist.songs ? playlist.songs.length : 0,
             totalDuration: playlist.songs ? playlist.songs.reduce((total, song) => total + song.duration, 0) : 0,
-            playCount: 0, // TODO: Implement play count tracking
+            playCount: 0,
             userId: playlist.user_id.toString(),
             songs: playlist.songs ? playlist.songs.map(song => ({
                 id: song.id.toString(),
