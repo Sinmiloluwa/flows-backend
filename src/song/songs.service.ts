@@ -1,13 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Song } from './entities/song.entity';
 import { CreateSongDto } from './dtos';
 import { Artist } from '../artist/entities/artist.entity';
+import { RecentlyPlayed } from './entities/recently-played.entity';
+import { CreateRecentlyPlayedDto } from './dtos/create-recently-played.dto';
 
 @Injectable()
 export class SongsService {
     constructor(
         @Inject('SONG_REPOSITORY')
-        private songModel: typeof Song
+        private songModel: typeof Song,
+        @Inject('RECENTLY_PLAYED_REPOSITORY')
+        private recentlyPlayedModel: typeof RecentlyPlayed
     ) { }
 
     async addSong(songDto: CreateSongDto, userId?: string, artistId?: string): Promise<Song> {
@@ -70,5 +74,56 @@ export class SongsService {
                     }
                 ]
             });
+    }
+
+    async updateRecentlyPlayed(userId: string, createRecentlyPlayedDto: CreateRecentlyPlayedDto): Promise<RecentlyPlayed> {
+        const song = await this.songModel.findByPk(createRecentlyPlayedDto.songId);
+        if (!song) {
+            throw new NotFoundException('Song not found');
+        }
+
+        const [recentlyPlayed, created] = await this.recentlyPlayedModel.findOrCreate({
+            where: {
+                user_id: userId,
+                song_id: createRecentlyPlayedDto.songId
+            },
+            defaults: {
+                user_id: userId,
+                song_id: createRecentlyPlayedDto.songId,
+                played_at: new Date()
+            }
+        });
+
+        if (!created) {
+            await recentlyPlayed.update({
+                updatedAt: new Date(),
+                played_at: new Date()
+            });
+        }
+
+        return recentlyPlayed;
+
+        // Implement the logic to update recently played songs
+    }
+
+    async getRecentlyPlayed(userId: string): Promise<RecentlyPlayed[]> {
+        return this.recentlyPlayedModel.findAll({
+            where: { user_id: userId },
+            include: [
+                {
+                    model: this.songModel, // Use the injected song model
+                    as: 'song',
+                    required: true,
+                    include: [
+                        {
+                            model: Artist,
+                            as: 'artists',
+                            through: { attributes: [] }
+                        }
+                    ]
+                }
+            ],
+            order: [['played_at', 'DESC']]
+        });
     }
 }
