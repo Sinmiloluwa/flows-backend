@@ -11,6 +11,7 @@ import { Subscription } from '../subscription/entities/subscription.entity';
 import { SongArtist } from '../song-artists/entities/song-artist.entity';
 import { SEQUELIZE } from '../../constants';
 import { Category } from '../categories/entities/category.entity';
+import { RecentlyPlayed } from '../song/entities/recently-played.entity';
 
 export const databaseProviders = [
   {
@@ -38,7 +39,8 @@ export const databaseProviders = [
         LikedSong,
         Subscription,
         SongArtist,
-        Category
+        Category,
+        RecentlyPlayed
       ]);
       
       // Use alter sync only if SYNC_ALTER env var is set to 'true', otherwise use fast sync
