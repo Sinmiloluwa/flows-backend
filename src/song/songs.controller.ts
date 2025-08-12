@@ -5,6 +5,7 @@ import { UserGuard } from '../guards/user.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { ArtistGuard } from './guards/artist.guard';
 import { CurrentArtist } from './decorators/current-artist.decorator';
+import { CreateRecentlyPlayedDto } from './dtos/create-recently-played.dto';
 
 @Controller('songs')
 export class SongsController {
@@ -27,6 +28,19 @@ export class SongsController {
     findAllSongs(@CurrentUser() user: any): Promise<any[]> {
         console.log(`Songs fetched by user: ${user ? user.sub : 'anonymous'}`);
         return this.songsService.findAll();
+    }
+
+    @UseGuards(UserGuard)
+    @Post('recently-played')
+    updateRecentlyPlayed(@Body() createRecentlyPlayedDto :CreateRecentlyPlayedDto,@CurrentUser() user: any) {
+        console.log(`Updating recently played songs for user: ${user ? user.sub : 'anonymous'}`);
+        return this.songsService.updateRecentlyPlayed(user.sub, createRecentlyPlayedDto);
+    }
+
+    @UseGuards(UserGuard)
+    @Get('recently-played-songs')
+    getRecentlyPlayed(@CurrentUser() user: any) {
+        return this.songsService.getRecentlyPlayed(user.sub);
     }
 
     @UseGuards(UserGuard)
