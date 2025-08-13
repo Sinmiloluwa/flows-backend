@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongDto } from './dtos';
 import { UserGuard } from '../guards/user.guard';
@@ -39,8 +39,8 @@ export class SongsController {
 
     @UseGuards(UserGuard)
     @Get('recently-played-songs')
-    getRecentlyPlayed(@CurrentUser() user: any) {
-        return this.songsService.getRecentlyPlayed(user.sub);
+    getRecentlyPlayed(@CurrentUser() user: any, @Query('limit') limit: number = 10): Promise<any[]> {
+        return this.songsService.getRecentlyPlayed(user.sub, limit);
     }
 
     @UseGuards(UserGuard)

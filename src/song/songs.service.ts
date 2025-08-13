@@ -106,7 +106,7 @@ export class SongsService {
         // Implement the logic to update recently played songs
     }
 
-    async getRecentlyPlayed(userId: string): Promise<RecentlyPlayed[]> {
+    async getRecentlyPlayed(userId: string, limit: number): Promise<RecentlyPlayed[]> {
         return this.recentlyPlayedModel.findAll({
             where: { user_id: userId },
             include: [
@@ -123,7 +123,8 @@ export class SongsService {
                     ]
                 }
             ],
-            order: [['played_at', 'DESC']]
+            order: [['played_at', 'DESC']],
+            limit
         });
     }
 }
