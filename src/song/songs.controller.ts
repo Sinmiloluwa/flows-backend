@@ -44,6 +44,12 @@ export class SongsController {
     }
 
     @UseGuards(UserGuard)
+    @Get('recommendations')
+    getRecommendations(@CurrentUser() user: any): Promise<any[]> {
+        return this.songsService.getRecommendations(user.sub);
+    }
+
+    @UseGuards(UserGuard)
     @Get(':id')
     findSongById(
         @CurrentUser() user: any,
@@ -53,5 +59,4 @@ export class SongsController {
         console.log(`Song fetched by user: ${user ? user.sub : 'anonymous'}, artist: ${artist ? artist.id : 'none'}`);
         return this.songsService.findById(id);
     }
-
 }
