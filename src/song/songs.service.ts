@@ -4,6 +4,7 @@ import { CreateSongDto } from './dtos';
 import { Artist } from '../artist/entities/artist.entity';
 import { RecentlyPlayed } from './entities/recently-played.entity';
 import { CreateRecentlyPlayedDto } from './dtos/create-recently-played.dto';
+import { Op, Sequelize, QueryTypes } from 'sequelize';
 
 @Injectable()
 export class SongsService {
@@ -126,5 +127,28 @@ export class SongsService {
             order: [['played_at', 'DESC']],
             limit
         });
+    }
+
+    async getRecommendations(userId: string): Promise<Song[]> {
+        const songs = await this.songModel.findAll({
+            where: {
+                id: {
+                    [Op.notIn]: Sequelize.literal(`(
+                        SELECT song_id FROM recently_played WHERE user_id = '${userId}'
+                    )`)
+                }
+            },
+            order: [['createdAt', 'DESC']],
+            limit: 5,
+            include: [
+                {
+                    model: Artist,
+                    as: 'artists',
+                    through: { attributes: [] }
+                }
+            ]
+        });
+
+        return songs;
     }
 }
