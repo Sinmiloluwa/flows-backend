@@ -4,12 +4,14 @@ import { CreatePlaylistDto, UpdatePlaylistDto, PlaylistResponseDto } from './dto
 import { Song } from '../song/entities/song.entity';
 import { Artist } from '../artist/entities/artist.entity';
 import { PlaylistSong } from '../playlist-songs/entities/playlist-song.entity';
+import { Sequelize, Op, QueryTypes } from 'sequelize';
 
 @Injectable()
 export class PlaylistService {
     constructor(
-        @Inject('PLAYLIST_REPOSITORY') private readonly playlistModel: typeof Playlist
-    ) {}
+        @Inject('PLAYLIST_REPOSITORY') private readonly playlistModel: typeof Playlist,
+        @Inject('SONG_REPOSITORY') private readonly songModel: typeof Song,
+    ) { }
 
     async createPlaylist(createPlaylistDto: CreatePlaylistDto, userId: string): Promise<PlaylistResponseDto> {
         try {
@@ -34,7 +36,7 @@ export class PlaylistService {
 
     async getAllPlaylists(userId?: string): Promise<PlaylistResponseDto[]> {
         try {
-            const whereCondition = userId 
+            const whereCondition = userId
                 ? { user_id: userId }
                 : { is_public: true }; // Only show public playlists if no user
 
@@ -234,5 +236,69 @@ export class PlaylistService {
             createdAt: playlist.createdAt,
             updatedAt: playlist.updatedAt
         };
+    }
+
+    async getMadeForYou(userId: string): Promise<Song[]> {
+        if (!this.songModel.sequelize) {
+            throw new Error('Sequelize instance is not available on songModel');
+        }
+        const favoriteGenres = await this.songModel.sequelize.query(
+            `SELECT s.genre, COUNT(*) as count
+         FROM recently_played rp
+         JOIN songs s ON rp.song_id = s.id
+         WHERE rp.user_id = :userId AND s.genre IS NOT NULL
+         GROUP BY s.genre
+         ORDER BY count DESC
+         LIMIT 2`,
+            { replacements: { userId }, type: QueryTypes.SELECT }
+        );
+
+        let recommendations: Song[] = [];
+        for (const { genre } of favoriteGenres as any[]) {
+            const songs = await this.songModel.findAll({
+                where: {
+                    genre,
+                    id: {
+                        [Op.notIn]: Sequelize.literal(`(
+                        SELECT song_id FROM recently_played WHERE user_id = '${userId}'
+                    )`)
+                    }
+                },
+                include: [
+                    {
+                        model: Artist,
+                        as: 'artists',
+                        through: { attributes: [] }
+                    }
+                ],
+                limit: 2
+            });
+            recommendations.push(...songs);
+        }
+
+        // Add trending songs as a fallback
+        if (recommendations.length < 6) {
+            const trendingSongs = await this.songModel.findAll({
+                where: {
+                    id: {
+                        [Op.notIn]: Sequelize.literal(`(
+                        SELECT song_id FROM recently_played WHERE user_id = '${userId}'
+                    )`)
+                    }
+                },
+                order: [['createdAt', 'DESC']],
+                limit: 6 - recommendations.length,
+                include: [
+                    {
+                        model: Artist,
+                        as: 'artists',
+                        through: { attributes: [] }
+                    }
+                ]
+            });
+            recommendations.push(...trendingSongs);
+        }
+
+        return recommendations;
     }
 }
