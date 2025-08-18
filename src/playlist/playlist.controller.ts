@@ -15,7 +15,8 @@ import { PlaylistService } from './playlist.service';
 import { CreatePlaylistDto, UpdatePlaylistDto, PlaylistResponseDto } from './dtos';
 import { UserGuard } from '../guards/user.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
-import { Song } from 'src/song/entities/song.entity';
+import { Song } from '../song/entities/song.entity';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('playlists')
 export class PlaylistController {
@@ -31,10 +32,13 @@ export class PlaylistController {
         return await this.playlistService.createPlaylist(createPlaylistDto, user.sub);
     }
 
+    @ApiOperation({ summary: 'Get made for you playlists' })
+    @ApiResponse({ status: 403, description: 'Forbidden.' })
+    @ApiResponse({ status: 200, description: 'Successful retrieval of playlists.', type: [Song] })  
     @Get('made-for-you')
     @HttpCode(HttpStatus.OK)
     @UseGuards(UserGuard)
-    async getMadeForYouPlaylists(@CurrentUser() user: any): Promise<Song[]> {
+    async getMadeForYouPlaylists(@CurrentUser() user: any): Promise<{ message: string; data: Song[] }> {
         return await this.playlistService.getMadeForYou(user.sub);
     }
 
