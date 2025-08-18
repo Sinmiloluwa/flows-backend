@@ -238,7 +238,7 @@ export class PlaylistService {
         };
     }
 
-    async getMadeForYou(userId: string): Promise<Song[]> {
+    async getMadeForYou(userId: string): Promise<{ message: string; data: Song[] }> {
         if (!this.songModel.sequelize) {
             throw new Error('Sequelize instance is not available on songModel');
         }
@@ -299,6 +299,9 @@ export class PlaylistService {
             recommendations.push(...trendingSongs);
         }
 
-        return recommendations;
+        return {
+            message: 'Personalized recommendations generated successfully.',
+            data: recommendations
+        };
     }
 }
