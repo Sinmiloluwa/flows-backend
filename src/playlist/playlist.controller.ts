@@ -15,6 +15,7 @@ import { PlaylistService } from './playlist.service';
 import { CreatePlaylistDto, UpdatePlaylistDto, PlaylistResponseDto } from './dtos';
 import { UserGuard } from '../guards/user.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
+import { Song } from 'src/song/entities/song.entity';
 
 @Controller('playlists')
 export class PlaylistController {
@@ -28,6 +29,13 @@ export class PlaylistController {
         @CurrentUser() user: any
     ): Promise<PlaylistResponseDto> {
         return await this.playlistService.createPlaylist(createPlaylistDto, user.sub);
+    }
+
+    @Get('made-for-you')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(UserGuard)
+    async getMadeForYouPlaylists(@CurrentUser() user: any): Promise<Song[]> {
+        return await this.playlistService.getMadeForYou(user.sub);
     }
 
     @Get()
