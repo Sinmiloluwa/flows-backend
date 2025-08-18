@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PlaylistService } from './playlist.service';
 import { PlaylistController } from './playlist.controller';
 import { Playlist } from './entities/playlist.entity';
+import { Song } from '../song/entities/song.entity';
 
 @Module({
   imports: [JwtModule],
@@ -11,6 +12,10 @@ import { Playlist } from './entities/playlist.entity';
     {
       provide: 'PLAYLIST_REPOSITORY',
       useValue: Playlist,
+    },
+    {
+      provide: 'SONG_REPOSITORY',
+      useValue: Song,
     }
   ],
   controllers: [PlaylistController]
