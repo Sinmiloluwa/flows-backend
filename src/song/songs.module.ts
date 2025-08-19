@@ -4,6 +4,7 @@ import { SongsService } from './songs.service';
 import { SongsController } from './songs.controller';
 import { Song } from './entities/song.entity';
 import { RecentlyPlayed } from './entities/recently-played.entity';
+import { Category } from '../categories/entities/category.entity';
 
 @Module({
   imports: [JwtModule],
@@ -16,6 +17,14 @@ import { RecentlyPlayed } from './entities/recently-played.entity';
     {
       provide: 'RECENTLY_PLAYED_REPOSITORY',
       useValue: RecentlyPlayed,
+    },
+    {
+      provide: 'RECENTLY_PLAYED_REPOSITORY',
+      useValue: RecentlyPlayed,
+    },
+    {
+      provide: 'CATEGORY_REPOSITORY',
+      useValue: Category,
     },
   ],
   controllers: [SongsController]
