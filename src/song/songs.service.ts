@@ -5,6 +5,7 @@ import { Artist } from '../artist/entities/artist.entity';
 import { RecentlyPlayed } from './entities/recently-played.entity';
 import { CreateRecentlyPlayedDto } from './dtos/create-recently-played.dto';
 import { Op, Sequelize, QueryTypes } from 'sequelize';
+import { Category } from '../categories/entities/category.entity';
 
 @Injectable()
 export class SongsService {
@@ -12,7 +13,9 @@ export class SongsService {
         @Inject('SONG_REPOSITORY')
         private songModel: typeof Song,
         @Inject('RECENTLY_PLAYED_REPOSITORY')
-        private recentlyPlayedModel: typeof RecentlyPlayed
+        private recentlyPlayedModel: typeof RecentlyPlayed,
+        @Inject('CATEGORY_REPOSITORY')
+        private categoryModel: typeof Category
     ) { }
 
     async addSong(songDto: CreateSongDto, userId?: string, artistId?: string): Promise<Song> {
@@ -150,5 +153,22 @@ export class SongsService {
         });
 
         return songs;
+    }
+
+    async findByCategory(id: number): Promise<Song[]> {
+        const category = await this.categoryModel.findByPk(id);
+        if (!category) {
+            throw new NotFoundException('Category not found');
+        }
+        return this.songModel.findAll({
+            where: { genre: category.name },
+            include: [
+                {
+                    model: Artist,
+                    as: 'artists',
+                    through: { attributes: [] }
+                }
+            ]
+        });
     }
 }
