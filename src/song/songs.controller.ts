@@ -6,6 +6,7 @@ import { CurrentUser } from '../decorators/current-user.decorator';
 import { ArtistGuard } from './guards/artist.guard';
 import { CurrentArtist } from './decorators/current-artist.decorator';
 import { CreateRecentlyPlayedDto } from './dtos/create-recently-played.dto';
+import { Song } from './entities/song.entity';
 
 @Controller('songs')
 export class SongsController {
@@ -58,5 +59,11 @@ export class SongsController {
     ): Promise<any> {
         console.log(`Song fetched by user: ${user ? user.sub : 'anonymous'}, artist: ${artist ? artist.id : 'none'}`);
         return this.songsService.findById(id);
+    }
+    
+    @UseGuards(UserGuard)
+    @Get('songs-by-category/:id')
+    findByCategory(@Param('id') id: number): Promise<Song[]> {
+        return this.songsService.findByCategory(id);
     }
 }
