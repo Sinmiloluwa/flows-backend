@@ -63,6 +63,13 @@ export class Song extends Model {
   })
   declare cover_image_url: string;
 
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+  })
+  declare likes: number;
+
   // Many-to-many relationship: Song has many Artists through SongArtist
   @BelongsToMany(() => Artist, () => SongArtist)
   declare artists: Artist[];
