@@ -51,6 +51,12 @@ export class SongsController {
     }
 
     @UseGuards(UserGuard)
+    @Get('liked-songs')
+    getLikedSongs(@CurrentUser() user: any): Promise<any[]> {
+        return this.songsService.getLikedSongs(user.sub);
+    }
+
+    @UseGuards(UserGuard)
     @Get(':id')
     findSongById(
         @CurrentUser() user: any,
@@ -65,5 +71,11 @@ export class SongsController {
     @Get('songs-by-category/:id')
     findByCategory(@Param('id') id: number): Promise<Song[]> {
         return this.songsService.findByCategory(id);
+    }
+
+    @UseGuards(UserGuard)
+    @Post(':id/like')
+    likeSong(@CurrentUser() user: any, @Param('id') id: number): Promise<void> {
+        return this.songsService.likeSong(user.sub, id);
     }
 }
