@@ -6,6 +6,7 @@ import { RecentlyPlayed } from './entities/recently-played.entity';
 import { CreateRecentlyPlayedDto } from './dtos/create-recently-played.dto';
 import { Op, Sequelize, QueryTypes } from 'sequelize';
 import { Category } from '../categories/entities/category.entity';
+import { LikedSong } from 'src/liked-songs/entities/liked-song.entity';
 
 @Injectable()
 export class SongsService {
@@ -15,7 +16,9 @@ export class SongsService {
         @Inject('RECENTLY_PLAYED_REPOSITORY')
         private recentlyPlayedModel: typeof RecentlyPlayed,
         @Inject('CATEGORY_REPOSITORY')
-        private categoryModel: typeof Category
+        private categoryModel: typeof Category,
+        @Inject('LIKED_SONG_REPOSITORY')
+        private likedSongModel: typeof LikedSong
     ) { }
 
     async addSong(songDto: CreateSongDto, userId?: string, artistId?: string): Promise<Song> {
@@ -167,6 +170,58 @@ export class SongsService {
                     model: Artist,
                     as: 'artists',
                     through: { attributes: [] }
+                }
+            ]
+        });
+    }
+
+    async likeSong(userId: string, songId: number): Promise<void> {
+        const song = await this.songModel.findByPk(songId);
+        if (!song) {
+            throw new NotFoundException('Song not found');
+        }
+        const likedSong = await this.likedSongModel.findOne({
+            where: {
+                user_id: userId,
+                song_id: songId
+            }
+        });
+        if (likedSong) {
+            await likedSong.destroy();
+            await this.songModel.decrement('likes', {
+                by: 1,
+                where: { id: songId }
+            });
+
+            return;
+        }
+
+        await this.songModel.increment('likes', {
+            by: 1,
+            where: { id: songId }
+        });
+
+        await this.likedSongModel.create({
+            user_id: userId,
+            song_id: songId
+        });
+    }
+
+    async getLikedSongs(userId: string): Promise<any[]> {
+        return this.likedSongModel.findAll({
+            where: { user_id: userId },
+            include: [
+                {
+                    model: this.songModel,
+                    as: 'song',
+                    required: true,
+                    include: [
+                        {
+                            model: Artist,
+                            as: 'artists',
+                            through: { attributes: [] }
+                        }
+                    ]
                 }
             ]
         });
